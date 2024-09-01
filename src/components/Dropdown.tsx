@@ -2,7 +2,7 @@
 
 import { cn } from "@/misc/utils";
 import { IconChevronDown, IconSearch } from "@tabler/icons-react";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useState } from "react";
 import ModalDialog from "./ModalDialog";
 import Button from "./Button";
 

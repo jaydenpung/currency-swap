@@ -1,13 +1,7 @@
 "use client";
 
 import { cn } from "@/misc/utils";
-import {
-  InputHTMLAttributes,
-  forwardRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import Dropdown from "./Dropdown";
 import NumberInput from "./NumberInput";
 import { Currency } from "@/misc/types";

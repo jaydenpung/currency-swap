@@ -1,24 +1,25 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import Big from "big.js";
+
 import Accordion from "@/components/Accordion";
 import Button from "@/components/Button";
 import CurrencyInput from "@/components/CurrencyInput";
-import Dropdown from "@/components/Dropdown";
-import NumberInput from "@/components/NumberInput";
-import { CURRENCIES, USD_CONVERT_RATES } from "@/misc/constants";
+import { USD_CONVERT_RATES } from "@/misc/constants";
 import { Currency } from "@/misc/types";
-import { cn } from "@/misc/utils";
-import { IconArrowsUpDown, IconSettingsFilled } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { IconArrowsUpDown } from "@tabler/icons-react";
 
 const convertCurrency = (
   fromCurrency: Currency,
   toCurrency: Currency,
   amount: number
 ) => {
-  return (
-    (amount * USD_CONVERT_RATES[toCurrency]) / USD_CONVERT_RATES[fromCurrency]
-  );
+  const amountBig = new Big(amount);
+  const fromRate = new Big(USD_CONVERT_RATES[fromCurrency]);
+  const toRate = new Big(USD_CONVERT_RATES[toCurrency]);
+
+  return Number(amountBig.times(toRate).div(fromRate));
 };
 
 export default function Home() {
