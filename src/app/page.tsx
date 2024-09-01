@@ -1,112 +1,157 @@
-import Image from "next/image";
+"use client";
+
+import Accordion from "@/components/Accordion";
+import Button from "@/components/Button";
+import CurrencyInput from "@/components/CurrencyInput";
+import Dropdown from "@/components/Dropdown";
+import NumberInput from "@/components/NumberInput";
+import { CURRENCIES, USD_CONVERT_RATES } from "@/misc/constants";
+import { Currency } from "@/misc/types";
+import { cn } from "@/misc/utils";
+import { IconArrowsUpDown, IconSettingsFilled } from "@tabler/icons-react";
+import { useEffect, useRef, useState } from "react";
+
+const convertCurrency = (
+  fromCurrency: Currency,
+  toCurrency: Currency,
+  amount: number
+) => {
+  return (
+    (amount * USD_CONVERT_RATES[toCurrency]) / USD_CONVERT_RATES[fromCurrency]
+  );
+};
 
 export default function Home() {
+  const isUpdating = useRef(false);
+  const [fromCurrency, setFromCurrency] = useState<Currency>("USD");
+  const [toCurrency, setToCurrency] = useState<Currency>("AUD");
+  const [fromValue, setFromValue] = useState<number | undefined>();
+  const [toValue, setToValue] = useState<number | undefined>();
+
+  const [isSwapping, setIsSwapping] = useState(false);
+
+  // it just put the value of "from" to "to"
+  const reverseInputOutput = () => {
+    setToCurrency(fromCurrency);
+    setToValue(fromValue);
+  };
+
+  // Handle selling currency conversion
+  useEffect(() => {
+    if (fromValue !== undefined && !isUpdating.current) {
+      isUpdating.current = true;
+      setToValue(convertCurrency(fromCurrency, toCurrency, fromValue) * 0.99);
+    } else {
+      isUpdating.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromCurrency, fromValue]);
+
+  // Handle buying currency conversion
+  useEffect(() => {
+    if (toValue !== undefined && !isUpdating.current) {
+      isUpdating.current = true;
+      setFromValue(convertCurrency(toCurrency, fromCurrency, toValue) * 1.01);
+    } else {
+      isUpdating.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toCurrency, toValue]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <main className="flex min-h-screen flex-col items-center gap-4 bg-page-background">
+      <div className="flex flex-col justify-center gap-1 p-2 sm:p-24 w-full">
+        {/* From Currency Input */}
+        <CurrencyInput
+          label="You're Selling"
+          amount={fromValue}
+          currency={fromCurrency}
+          onAmountChange={(value) => {
+            setFromValue(value);
+          }}
+          onCurrencyChange={(value) => {
+            setFromCurrency(value);
+          }}
         />
-      </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+        {/* Reverse */}
+        <div className="flex justify-center">
+          <Button
+            label="ghost"
+            size="sm"
+            shape="rounded"
+            color="secondary"
+            className="w-9 h-9 border-[3px] hover:border-[3px] border-dark bg-transparent"
+            iconOnly={<IconArrowsUpDown size="14px" />}
+            onClick={reverseInputOutput}
+          />
+        </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+        {/* To Currency Input */}
+        <CurrencyInput
+          label="You're Buying"
+          amount={toValue}
+          currency={toCurrency}
+          onAmountChange={(value) => {
+            setToValue(value);
+          }}
+          onCurrencyChange={(value) => {
+            setToCurrency(value);
+          }}
+        />
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+        {/* Swap Button */}
+        <Button
+          label="Swap"
+          color="primary"
+          shape="pill"
+          size="lg"
+          className="mt-10"
+          isLoading={isSwapping}
+          disabled={!fromValue && !toValue}
+          onClick={() => {
+            setIsSwapping(true);
+            // mock swapping
+            setTimeout(() => {
+              setIsSwapping(false);
+              alert("Swapped!");
+            }, 2000);
+          }}
+        />
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        {/* Single Accordion */}
+        <div className="flex justify-center w-full">
+          <div className="flex px-24 pt-2 w-[400px]">
+            <Accordion
+              title="Show more info"
+              speed="slow"
+              className="text-xs"
+              content={
+                <div>
+                  <p className="text-center text-white">
+                    We charge a 1% fees for all conversion
+                  </p>
+                  <div>
+                    {Object.entries(USD_CONVERT_RATES).map(
+                      ([currency, rate]) => (
+                        <div
+                          key={currency}
+                          className="flex flex-row justify-between items-center min-w-[100px] w-full py-2 px-3 hover:bg-primary/10 cursor-pointer text-sm text-white"
+                        >
+                          <p>{currency}</p>
+                          <div className="flex flex-col text-white/50 text-xs text-right">
+                            <p>$1 = {rate}</p>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              }
+              variant="ghost"
+            />
+          </div>
+        </div>
       </div>
     </main>
   );
