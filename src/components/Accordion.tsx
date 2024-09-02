@@ -86,11 +86,9 @@ const Accordion = ({
       <div
         ref={contentRef}
         className={cn(
-          `transition-max-height ease-in-out`,
+          `ease-in-out transition-all overflow-hidden`,
           speedToCss[speed],
-          isOpen
-            ? `max-h-[${contentRef?.current?.scrollHeight}px]`
-            : "max-h-0 overflow-hidden"
+          isOpen ? `max-h-[${contentRef?.current?.scrollHeight}px]` : "max-h-0"
         )}
         style={{ maxHeight: isOpen ? contentHeight : "0" }}
       >

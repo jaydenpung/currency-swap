@@ -29,6 +29,7 @@ const NumberInput = (props: Props) => {
       thousandSeparator={thousandSeparator}
       value={props.value ?? undefined}
       onValueChange={props.onValueChange}
+      placeholder="0.00"
     />
   );
 };

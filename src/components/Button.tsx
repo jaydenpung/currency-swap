@@ -60,7 +60,7 @@ const Button = forwardRef<HTMLButtonElement, Props>(
         ref={ref}
         className={cn(
           "flex flex-row justify-center items-center border",
-          "hover:border hover:border-primary/50 hover:text-primary",
+          "hover:border hover:border-primary/50 hover:text-primary hover:shadow-swap-input-dark",
           colorToClass[color],
           shapeToClass[shape],
           sizeToClass[size],

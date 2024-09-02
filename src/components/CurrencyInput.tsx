@@ -70,8 +70,8 @@ const CurrencyInput = ({
   return (
     <div
       className={cn(
-        "flex flex-col bg-dark p-4 rounded-xl",
-        "space-y-3 focus-within:ring-2 focus-within:ring-primary"
+        "flex flex-col bg-dark p-4 rounded-xl space-y-3 ",
+        "focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-swap-input-dark"
       )}
     >
       <div className="flex flex-row justify-between">

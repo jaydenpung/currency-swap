@@ -36,7 +36,8 @@ const Dropdown = (props: Props) => {
         className={cn(
           "flex flex-row rounded-lg items-center justify-center gap-3",
           "py-2 px-3 h-10 bg-page-background",
-          "hover: cursor-pointer",
+          "hover:border-primary/50 hover:bg-[rgba(199,242,132,0.2)] hover:border",
+          "hover: cursor-pointer hover:shadow-swap-input-dark",
           props.className
         )}
         onClick={() => setIsOpen(true)}

@@ -61,7 +61,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-4 bg-page-background">
-      <div className="flex flex-col justify-center gap-1 p-2 sm:p-24 w-full">
+      <div className="flex flex-col justify-center gap-1 p-2 sm:p-24 w-full sm:max-w-[800px]">
         {/* From Currency Input */}
         <CurrencyInput
           label="You're Selling"
