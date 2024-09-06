@@ -9,6 +9,7 @@ type Props = {
   className?: string;
   value?: number;
   onValueChange: (values: NumberFormatValues) => void;
+  onInput: () => void;
 };
 
 const NumberInput = (props: Props) => {
@@ -29,6 +30,7 @@ const NumberInput = (props: Props) => {
       thousandSeparator={thousandSeparator}
       value={props.value ?? undefined}
       onValueChange={props.onValueChange}
+      onInput={props.onInput}
       placeholder="0.00"
     />
   );

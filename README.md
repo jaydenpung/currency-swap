@@ -7,7 +7,7 @@
 Built and tested with nodejs 20.10.0
 
 ```bash
-npm run i
+npm i
 npm run dev
 ```
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Big from "big.js";
 
 import Accordion from "@/components/Accordion";
 import Button from "@/components/Button";
@@ -9,61 +8,50 @@ import CurrencyInput from "@/components/CurrencyInput";
 import { USD_CONVERT_RATES } from "@/misc/constants";
 import { Currency } from "@/misc/types";
 import { IconArrowsUpDown } from "@tabler/icons-react";
-
-const convertCurrency = (
-  fromCurrency: Currency,
-  toCurrency: Currency,
-  amount: number
-) => {
-  const amountBig = new Big(amount);
-  const fromRate = new Big(USD_CONVERT_RATES[fromCurrency]);
-  const toRate = new Big(USD_CONVERT_RATES[toCurrency]);
-
-  return Number(amountBig.times(toRate).div(fromRate));
-};
+import { convertCurrency } from "@/misc/utils";
 
 export default function Home() {
-  const isUpdating = useRef(false);
   const [fromCurrency, setFromCurrency] = useState<Currency>("USD");
   const [toCurrency, setToCurrency] = useState<Currency>("AUD");
   const [fromValue, setFromValue] = useState<number | undefined>();
   const [toValue, setToValue] = useState<number | undefined>();
+  const lastChanged = useRef<"from" | "to">("from");
 
   const [isSwapping, setIsSwapping] = useState(false);
 
   // it just put the value of "from" to "to"
   const reverseInputOutput = () => {
-    setToCurrency(fromCurrency);
-    setToValue(fromValue);
+    if (lastChanged.current === "from") {
+      setFromCurrency(toCurrency);
+      setToCurrency(fromCurrency);
+      setToValue(fromValue);
+    } else {
+      setToCurrency(fromCurrency);
+      setFromCurrency(toCurrency);
+      setFromValue(toValue);
+    }
   };
 
-  // Handle selling currency conversion
   useEffect(() => {
-    if (fromValue !== undefined && !isUpdating.current) {
-      isUpdating.current = true;
-      setToValue(convertCurrency(fromCurrency, toCurrency, fromValue) * 0.99);
-    } else {
-      isUpdating.current = false;
+    // Handle selling currency conversion
+    if (fromValue !== undefined && lastChanged.current === "from") {
+      setToValue(convertCurrency(fromCurrency, toCurrency, fromValue, 1, true));
+    }
+    // Handle buying currency conversion
+    if (toValue !== undefined && lastChanged.current === "to") {
+      setFromValue(convertCurrency(toCurrency, fromCurrency, toValue, 1));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromCurrency, fromValue]);
-
-  // Handle buying currency conversion
-  useEffect(() => {
-    if (toValue !== undefined && !isUpdating.current) {
-      isUpdating.current = true;
-      setFromValue(convertCurrency(toCurrency, fromCurrency, toValue) * 1.01);
-    } else {
-      isUpdating.current = false;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toCurrency, toValue]);
+  }, [fromCurrency, fromValue, toCurrency, toValue]);
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-4 bg-page-background">
       <div className="flex flex-col justify-center gap-1 p-2 sm:p-24 w-full sm:max-w-[800px]">
         {/* From Currency Input */}
         <CurrencyInput
+          className={
+            lastChanged.current === "from" ? "bg-dark" : "bg-background"
+          }
           label="You're Selling"
           amount={fromValue}
           currency={fromCurrency}
@@ -72,6 +60,9 @@ export default function Home() {
           }}
           onCurrencyChange={(value) => {
             setFromCurrency(value);
+          }}
+          onInput={() => {
+            lastChanged.current = "from";
           }}
         />
 
@@ -90,6 +81,7 @@ export default function Home() {
 
         {/* To Currency Input */}
         <CurrencyInput
+          className={lastChanged.current === "to" ? "bg-dark" : "bg-background"}
           label="You're Buying"
           amount={toValue}
           currency={toCurrency}
@@ -98,6 +90,9 @@ export default function Home() {
           }}
           onCurrencyChange={(value) => {
             setToCurrency(value);
+          }}
+          onInput={() => {
+            lastChanged.current = "to";
           }}
         />
 

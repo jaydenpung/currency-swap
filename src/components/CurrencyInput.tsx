@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/misc/utils";
+import { cn, convertCurrency } from "@/misc/utils";
 import { useEffect, useState } from "react";
 import Dropdown from "./Dropdown";
 import NumberInput from "./NumberInput";
@@ -41,6 +41,8 @@ type Props = {
   currency: Currency;
   onAmountChange: (value: number) => void;
   onCurrencyChange: (value: Currency) => void;
+  onInput: () => void;
+  className?: string;
 };
 
 const CurrencyInput = ({
@@ -49,13 +51,15 @@ const CurrencyInput = ({
   currency,
   onAmountChange,
   onCurrencyChange,
+  onInput,
+  className,
 }: Props) => {
   const [amountInUsd, setAmountInUsd] = useState<string | undefined>();
 
   // convert to usd based on currency and show
   useEffect(() => {
     if (amount) {
-      const usdAmount = amount / USD_CONVERT_RATES[currency];
+      const usdAmount = convertCurrency(currency, "USD", amount);
       const usdAmountString = numericFormatter(usdAmount.toString(), {
         decimalScale: 2,
         fixedDecimalScale: true,
@@ -71,7 +75,8 @@ const CurrencyInput = ({
     <div
       className={cn(
         "flex flex-col bg-dark p-4 rounded-xl space-y-3 ",
-        "focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-swap-input-dark"
+        "focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-swap-input-dark",
+        className
       )}
     >
       <div className="flex flex-row justify-between">
@@ -103,6 +108,7 @@ const CurrencyInput = ({
             onValueChange={(value) => {
               onAmountChange(value.floatValue ?? 0);
             }}
+            onInput={onInput}
           />
           {amountInUsd && (
             <p className="text-xs font-normal text-white/25 text-right">
